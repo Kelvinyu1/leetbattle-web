@@ -39,7 +39,7 @@ body { margin: 0; background: #f8f9fa; color: #222; }
 .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; padding: 16px; }
 .left { padding: 8px; }
 .right { padding: 8px; }
-.statement { white-space: pre-wrap; background: #f7f7f9; padding: 12px; border-radius: 8px; }
+.statement { white-space: pre-wrap; padding: 12px; border-radius: 8px; }
 button { padding: 8px 12px; border: 0; background: #444; color: white; border-radius: 8px; cursor: pointer; }
 button[disabled] { opacity: .5; cursor: not-allowed; }
 input { padding: 8px; border-radius: 8px; border: 1px solid #ccc; }

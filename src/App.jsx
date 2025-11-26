@@ -171,7 +171,7 @@ export default function App() {
               <h1 className="text-5xl">{state.problem?.title}</h1>
               <p className="text-2xl">Difficulty: {state.problem?.difficulty}</p>
 
-              <p className="text-2xl mt-2">{state.problem?.statement}</p>
+              <pre className="statement bg-[#f7f7f9] text-2xl mt-2 text-font">{state.problem?.statement}</pre>
               {/* <p className="text-2xl mt-2">"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."</p>
               <p className="text-2xl mt-2">"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."</p>
               <p className="text-2xl mt-2">"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."</p>
@@ -188,7 +188,7 @@ export default function App() {
             </div>
 
 
-
+            {/* Code Section */}
             <div className={`w-full h-full ${theme === 'light' ? 'bg-[#C2C2C2]' : 'bg-[#2A2A2A]'}`}>
               <div className={`w-full h-1/14 rounded-b-lg ${theme === 'light' ? 'bg-[#D9D9D9] text-[#8897AA] shadow-[0_4px_0_0_#777777]' : 'bg-[#404040] text-[#D1E8EE] shadow-[0_4px_0_0_#000000]'} items-center flex text-font`}>
                 <p className="text-4xl ml-3"> {'</>'} Code</p>
@@ -197,7 +197,8 @@ export default function App() {
               <div className={`${theme === 'light' ? 'text-[#8897AA]' : 'text-[#D1E8EE]'} bg-[#666666] flex items-center w-24 justify-center rounded-t-lg`} style={{marginTop: 8 + "px", marginLeft: 77 + "px"}}>
                 <p className="text-font text-2xl">Python</p>
               </div>
-      
+                
+              {/* Editor/Submit Button */}
               <div className={`h-4/5 w-full ${theme === 'light' ? 'bg-[#D9D9D9]' : 'bg-[#404040]'} relative`}>
                 <div className="h-full">
                   < Editor
@@ -225,6 +226,23 @@ export default function App() {
 
           </div>
         </div>
+
+         {state.lastResult && (
+           <div className={`verdict ${state.lastResult.verdict === 'Accepted' ? 'ok' : 'bad'}`}>
+             Last verdict: {state.lastResult.verdict} ({state.lastResult.passCount}/{state.lastResult.total}) · {state.lastResult.timeMs} ms
+             {state.lastResult.error && <div className="err">{String(state.lastResult.error)}</div>}
+           </div>
+         )}
+
+         {state.over && (
+           <>
+             <h3>🏁 {state.over.winnerId ? (youWin ? 'You win!' : 'You lose.') : 'Time up!'}</h3>
+             <button className="submit" onClick={requestRematch}>🔁 Rematch</button>
+             {rematchStatus && (
+               <p>Rematch ready: {rematchStatus.readyCount}/{rematchStatus.total}</p>
+             )}
+           </>
+         )}
 
       </div>
     )
