@@ -13,6 +13,7 @@ export default function App() {
   const [rematchStatus, setRematchStatus] = useState(null);
 
   const [theme, setTheme] = useState('light');
+  const [section, setSection] = useState('code');
 
   const toggleTheme = () => {
     setTheme(prev => (prev === 'light' ? 'dark' : 'light'));
@@ -22,7 +23,7 @@ export default function App() {
   const handleEditorWillMount = (monaco) => {
     monaco.editor.defineTheme('lightTheme', {
       base: 'vs',
-      inherit:true,
+      inherit: true,
       rules: [],
       colors: {
         'editor.background': '#D9D9D9', // background
@@ -40,11 +41,11 @@ export default function App() {
         'editor.wordHighlightStrongBackground': '#00000000'
       },
     });
-  
+
 
     monaco.editor.defineTheme('darkTheme', {
       base: 'vs',
-      inherit:true,
+      inherit: true,
       rules: [],
       colors: {
         'editor.background': '#404040', // background
@@ -128,7 +129,7 @@ export default function App() {
         <h1>Leet Battle</h1>
         <div className="row">
           <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Your name" />
-          <button disabled={!connected} onClick={findMatch}>
+          <button className="bg-[#444444]" disabled={!connected} onClick={findMatch}>
             {connected ? 'Find Match' : 'Connecting...'}
           </button>
         </div>
@@ -154,51 +155,59 @@ export default function App() {
 
   const youWin = state.over?.winnerId && selfUserId && state.over.winnerId === selfUserId;
 
-    return (
-      <div className={`w-screen h-screen ${theme === 'light' ? 'bg-[#EDECF2]' : 'bg-[#2E2E31]'}`}>
+  return (
+    <div className={`w-screen h-screen ${theme === 'light' ? 'bg-[#EDECF2]' : 'bg-[#2E2E31]'}`}>
 
-        {/* Title */}
-        <div className={`w-screen h-1/16 rounded-b-lg  ${theme === 'light' ? 'bg-[#D9D9D9] text-[#8897AA] shadow-[0_4px_0_0_#777777]' : 'bg-[#404040] text-[#D1E8EE] shadow-[0_4px_0_0_#000000]'} items-center flex justify-between`}>
-          <p className="text-font text-shadow text-5xl ml-5">Leet Battle</p>
-          <p className="text-font text-5xl mr-5" onClick={toggleTheme}>{theme === 'light' ? "☽" : "☼"}</p>
-        </div>
+      {/* Title */}
+      <div className={`w-screen h-1/16 rounded-b-lg  ${theme === 'light' ? 'bg-[#D9D9D9] text-[#8897AA] shadow-[0_4px_0_0_#777777]' : 'bg-[#404040] text-[#D1E8EE] shadow-[0_4px_0_0_#000000]'} items-center flex justify-between`}>
+        <p className="text-font text-shadow text-5xl ml-5">Leet Battle</p>
+        <p className="text-font text-5xl mr-5 select-none" onClick={toggleTheme}>{theme === 'light' ? "☽" : "☼"}</p>
+      </div>
 
-        {/* Bottom Half */}
-        <div className="w-screen h-5/6 mt-10 flex flex-row gap-10">
+      {/* Bottom Half */}
+      <div className="w-screen h-5/6 mt-10 flex flex-row gap-10">
 
-          {/* Problem Section */}
-          <div className={`h-full w-1/3 ml-10 rounded-lg ${theme === 'light' ? 'bg-[#D9D9D9] text-[#8897AA]' : 'bg-[#404040] text-[#D1E8EE]'} text-font pt-3 p-5 overflow-auto`}>
-              <h1 className="text-5xl">{state.problem?.title}</h1>
-              <p className="text-2xl">Difficulty: {state.problem?.difficulty}</p>
+        {/* Problem Section */}
+        <div className={`h-full w-1/3 ml-10 rounded-lg ${theme === 'light' ? 'bg-[#D9D9D9] text-[#8897AA]' : 'bg-[#404040] text-[#D1E8EE]'} text-font pt-3 p-5 overflow-auto`}>
+          <h1 className="text-5xl">{state.problem?.title}</h1>
+          <p className="text-2xl">Difficulty: {state.problem?.difficulty}</p>
 
-              <pre className="statement bg-[#f7f7f9] text-2xl mt-2 text-font">{state.problem?.statement}</pre>
-              {/* <p className="text-2xl mt-2">"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."</p>
+          <pre className={`statement ${theme === 'light' ? 'bg-[#f7f7f9]' : 'bg-[#5d5d5e]'} text-2xl mt-2 text-font`}>{state.problem?.statement}</pre>
+          {/* <p className="text-2xl mt-2">"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."</p>
               <p className="text-2xl mt-2">"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."</p>
               <p className="text-2xl mt-2">"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."</p>
               <p className="text-2xl mt-2">"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."</p> */}
-          </div> 
+        </div>
 
-          {/* Right Side */}
-          <div className="flex flex-col w-3/5 gap-10">
-            {/* Score/Time */}
-            <div className={`w-full h-1/12 rounded-lg ${theme === 'light' ? 'bg-[#D9D9D9] text-[#8897AA] shadow-[0_4px_0_0_#777777]' : 'bg-[#404040] text-[#D1E8EE] shadow-[0_4px_0_0_#000000]'} text-font text-5xl items-center flex flex-row justify-between`}>
-                <p className="ml-5">{state.players?.[0]?.name ?? 'User1'}: {state.players?.[0]?.score ?? '0'}</p>
-                <p>Time Left: {state.remaining ?? state.countdownSeconds}s</p>
-                <p className="mr-5">{state.players?.[1]?.name ?? 'User2'}: {state.players?.[1]?.score ?? '0'}</p>
+        {/* Right Side */}
+        <div className="flex flex-col w-3/5 gap-10">
+          {/* Score/Time */}
+          <div className={`w-full h-1/12 rounded-lg ${theme === 'light' ? 'bg-[#D9D9D9] text-[#8897AA] shadow-[0_4px_0_0_#777777]' : 'bg-[#404040] text-[#D1E8EE] shadow-[0_4px_0_0_#000000]'} text-font text-5xl items-center flex flex-row justify-between`}>
+            <p className="ml-5">{state.players?.[0]?.name ?? 'User1'}: {state.players?.[0]?.score ?? '0'}</p>
+            <p>Time Left: {state.remaining ?? state.countdownSeconds}s</p>
+            <p className="mr-5">{state.players?.[1]?.name ?? 'User2'}: {state.players?.[1]?.score ?? '0'}</p>
+          </div>
+
+
+          {/* Code Section */}
+          <div className={`w-full h-full ${theme === 'light' ? 'bg-[#C2C2C2]' : 'bg-[#2A2A2A]'}`}>
+            <div className={`w-full h-1/14 rounded-b-lg ${theme === 'light' ? 'bg-[#D9D9D9] text-[#8897AA] shadow-[0_4px_0_0_#777777]' : 'bg-[#404040] text-[#D1E8EE] shadow-[0_4px_0_0_#000000]'} items-center flex text-font`}>
+              <p className="text-4xl ml-3"> {'</>'} Code</p>
+            </div>
+
+            <div className="flex flex-row gap-2">
+              <div className={`${theme === 'light' ? 'text-[#8897AA]' : 'text-[#D1E8EE]'} ${section === 'code' ? 'bg-[#444444]' : 'bg-[#666666]'} select-none flex items-center w-24 justify-center rounded-t-lg`} style={{ marginTop: 8 + "px", marginLeft: 77 + "px" }} onClick={() => setSection('code')}>
+                <p className="text-font text-2xl">Python</p>
+              </div>
+
+              <div className={`${theme === 'light' ? 'text-[#D75E5E]' : 'text-[#D75E5E]'} ${section === 'code' ? 'bg-[#666666]' : 'bg-[#444444]'} select-none flex items-center w-24 justify-center rounded-t-lg`} style={{ marginTop: 8 + "px", marginLeft: 5 + "px" }} onClick={() => setSection('result')}>
+                <p className="text-font text-2xl">Result</p>
+              </div>
             </div>
 
 
-            {/* Code Section */}
-            <div className={`w-full h-full ${theme === 'light' ? 'bg-[#C2C2C2]' : 'bg-[#2A2A2A]'}`}>
-              <div className={`w-full h-1/14 rounded-b-lg ${theme === 'light' ? 'bg-[#D9D9D9] text-[#8897AA] shadow-[0_4px_0_0_#777777]' : 'bg-[#404040] text-[#D1E8EE] shadow-[0_4px_0_0_#000000]'} items-center flex text-font`}>
-                <p className="text-4xl ml-3"> {'</>'} Code</p>
-              </div>
-
-              <div className={`${theme === 'light' ? 'text-[#8897AA]' : 'text-[#D1E8EE]'} bg-[#666666] flex items-center w-24 justify-center rounded-t-lg`} style={{marginTop: 8 + "px", marginLeft: 77 + "px"}}>
-                <p className="text-font text-2xl">Python</p>
-              </div>
-                
-              {/* Editor/Submit Button */}
+            {/* Editor/Submit Button */}
+            {section === 'code' &&
               <div className={`h-4/5 w-full ${theme === 'light' ? 'bg-[#D9D9D9]' : 'bg-[#404040]'} relative`}>
                 <div className="h-full">
                   < Editor
@@ -207,7 +216,7 @@ export default function App() {
                     value={code}
                     onChange={(v) => setCode(v || '')}
                     theme={theme === 'light' ? 'lightTheme' : 'darkTheme'}
-                    options={{ 
+                    options={{
                       minimap: { enabled: false },
                       fontFamily: '"Jersey 10", sans-serif',
                       fontSize: 24,
@@ -220,91 +229,101 @@ export default function App() {
                   />
                 </div>
 
-                <button className={`submit my-2 ${theme === 'light' ? 'bg-[#444444]' : 'bg-[#666666]'}`} onClick={submit} disabled={!!state.over}>Submit</button>
+                <button className={`submit my-2 w-full ${theme === 'light' ? 'bg-[#444444]' : 'bg-[#666666]'}`} onClick={() => (submit(), setSection('result'))} disabled={!!state.over}>Submit</button>
               </div>
-            </div>
+            }
+
+            {section === 'result' && state.lastResult &&
+              <div className={`w-6/7 h-4/5 verdict ${state.lastResult.verdict === 'Accepted' ? 'ok' : 'bad'} text-font text-2xl`} style={{ marginLeft: 77 + "px" }}>
+                Last verdict: {state.lastResult.verdict} ({state.lastResult.passCount}/{state.lastResult.total}) · {state.lastResult.timeMs} ms
+                {state.lastResult.error && <div className="err">{String(state.lastResult.error)}</div>}
+              </div>
+            }
+
+            {section === 'result' && !state.lastResult &&
+              <div className={`w-6/7 h-4/5 verdict bad text-font text-2xl`} style={{ marginLeft: 77 + "px" }}>
+                No Submissions Yet
+              </div>
+            }
 
           </div>
+
         </div>
-
-         {state.lastResult && (
-           <div className={`verdict ${state.lastResult.verdict === 'Accepted' ? 'ok' : 'bad'}`}>
-             Last verdict: {state.lastResult.verdict} ({state.lastResult.passCount}/{state.lastResult.total}) · {state.lastResult.timeMs} ms
-             {state.lastResult.error && <div className="err">{String(state.lastResult.error)}</div>}
-           </div>
-         )}
-
-         {state.over && (
-           <>
-             <h3>🏁 {state.over.winnerId ? (youWin ? 'You win!' : 'You lose.') : 'Time up!'}</h3>
-             <button className="submit" onClick={requestRematch}>🔁 Rematch</button>
-             {rematchStatus && (
-               <p>Rematch ready: {rematchStatus.readyCount}/{rematchStatus.total}</p>
-             )}
-           </>
-         )}
-
       </div>
-    )
 
-//   return (
-//     <div className="grid">
-//       <div className="left">
-//         <h2>{state.problem?.title}</h2>
-//         <p className="meta">
-//           Difficulty: {state.problem?.difficulty}{' '}
-//           {state.problem?.url && (
-//             <>
-//               · <a href={state.problem.url} target="_blank" rel="noreferrer">Open on LeetCode</a>
-//             </>
-//           )}
-//         </p>
-//         <pre className="statement">{state.problem?.statement}</pre>
+      {state.over && (
+        <div className="w-screen h-screen fixed inset-0 flex justify-center items-center bg-black/50 z-50">
+          <div className={`w-1/3 h-1/4 text-font text-center flex flex-col justify-center rounded-lg ${theme === 'light' ? 'bg-[#D9D9D9] text-[#8897AA] shadow-[0_4px_0_0_#777777]' : 'bg-[#404040] text-[#D1E8EE] shadow-[0_4px_0_0_#000000]'}`}>
+            <p className="text-5xl mt-5">🏁 {state.over.winnerId ? (youWin ? 'You win!' : 'You lose.') : 'Time up!'} 🏁</p>
+            {rematchStatus && (
+              <p className="text-4xl">Rematch ready: {rematchStatus.readyCount}/{rematchStatus.total}</p>
+            )}
+            <button className="text-2xl mx-10 mt-5 bg-[#444444] hover:bg-[#333333]" onClick={requestRematch}>🔁 Rematch?</button>
+          </div>
+        </div>
+      )}
 
-//         <p>⏱️ Time left: {state.remaining ?? state.countdownSeconds}s</p>
+    </div>
+  )
 
-//         {state.lastResult && (
-//           <div className={`verdict ${state.lastResult.verdict === 'Accepted' ? 'ok' : 'bad'}`}>
-//             Last verdict: {state.lastResult.verdict} ({state.lastResult.passCount}/{state.lastResult.total}) · {state.lastResult.timeMs} ms
-//             {state.lastResult.error && <div className="err">{String(state.lastResult.error)}</div>}
-//           </div>
-//         )}
+  //   return (
+  //     <div className="grid">
+  //       <div className="left">
+  //         <h2>{state.problem?.title}</h2>
+  //         <p className="meta">
+  //           Difficulty: {state.problem?.difficulty}{' '}
+  //           {state.problem?.url && (
+  //             <>
+  //               · <a href={state.problem.url} target="_blank" rel="noreferrer">Open on LeetCode</a>
+  //             </>
+  //           )}
+  //         </p>
+  //         <pre className="statement">{state.problem?.statement}</pre>
 
-//         {state.over && (
-//           <>
-//             <h3>🏁 {state.over.winnerId ? (youWin ? 'You win!' : 'You lose.') : 'Time up!'}</h3>
-//             <button className="submit" onClick={requestRematch}>🔁 Rematch</button>
-//             {rematchStatus && (
-//               <p>Rematch ready: {rematchStatus.readyCount}/{rematchStatus.total}</p>
-//             )}
-//           </>
-//         )}
+  //         <p>⏱️ Time left: {state.remaining ?? state.countdownSeconds}s</p>
 
-//         {/* Leaderboard in-room */}
-//         {scoreboard.length > 0 && (
-//           <>
-//             <h3 style={{ marginTop: 24 }}>🏆 Leaderboard</h3>
-//             <ol>
-//               {scoreboard.slice(0, 10).map((p) => (
-//                 <li key={p.userId}>
-//                   {p.name} — {p.wins}W/{p.losses}L
-//                 </li>
-//               ))}
-//             </ol>
-//           </>
-//         )}
-//       </div>
+  //         {state.lastResult && (
+  //           <div className={`verdict ${state.lastResult.verdict === 'Accepted' ? 'ok' : 'bad'}`}>
+  //             Last verdict: {state.lastResult.verdict} ({state.lastResult.passCount}/{state.lastResult.total}) · {state.lastResult.timeMs} ms
+  //             {state.lastResult.error && <div className="err">{String(state.lastResult.error)}</div>}
+  //           </div>
+  //         )}
 
-//       <div className="right">
-//         <Editor
-//           height="70vh"
-//           defaultLanguage="python"
-//           value={code}
-//           onChange={(v) => setCode(v || '')}
-//           options={{ minimap: { enabled: false } }}
-//         />
-//         <button className="submit" onClick={submit} disabled={!!state.over}>Submit</button>
-//       </div>
-//     </div>
-//   );
+  //         {state.over && (
+  //           <>
+  //             <h3>🏁 {state.over.winnerId ? (youWin ? 'You win!' : 'You lose.') : 'Time up!'}</h3>
+  //             <button className="submit" onClick={requestRematch}>🔁 Rematch</button>
+  //             {rematchStatus && (
+  //               <p>Rematch ready: {rematchStatus.readyCount}/{rematchStatus.total}</p>
+  //             )}
+  //           </>
+  //         )}
+
+  //         {/* Leaderboard in-room */}
+  //         {scoreboard.length > 0 && (
+  //           <>
+  //             <h3 style={{ marginTop: 24 }}>🏆 Leaderboard</h3>
+  //             <ol>
+  //               {scoreboard.slice(0, 10).map((p) => (
+  //                 <li key={p.userId}>
+  //                   {p.name} — {p.wins}W/{p.losses}L
+  //                 </li>
+  //               ))}
+  //             </ol>
+  //           </>
+  //         )}
+  //       </div>
+
+  //       <div className="right">
+  //         <Editor
+  //           height="70vh"
+  //           defaultLanguage="python"
+  //           value={code}
+  //           onChange={(v) => setCode(v || '')}
+  //           options={{ minimap: { enabled: false } }}
+  //         />
+  //         <button className="submit" onClick={submit} disabled={!!state.over}>Submit</button>
+  //       </div>
+  //     </div>
+  //   );
 }
