@@ -1,9 +1,9 @@
 @import "tailwindcss";
 
 .text-font {
-  font-family: "Jersey 10", sans-serif;
-  font-weight: 400;
-  font-style: normal;
+    font-family: "Jersey 10", sans-serif;
+    font-weight: 400;
+    font-style: normal;
 }
 
 .text-shadow {
@@ -11,7 +11,7 @@
 }
 
 ::-webkit-scrollbar {
-    width:8px;
+    width: 8px;
 }
 
 ::-webkit-scrollbar-track {
@@ -32,19 +32,78 @@
 }
 
 
-:root { font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif; }
-body { margin: 0; background: #f8f9fa; color: #222; }
-.wrap { padding: 32px; max-width: 800px; margin: auto; }
-.row { display: flex; gap: 8px; }
-.grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; padding: 16px; }
-.left { padding: 8px; }
-.right { padding: 8px; }
-.statement { white-space: pre-wrap; padding: 12px; border-radius: 8px; }
-button { padding: 8px 12px; border: 0; color: white; border-radius: 8px; cursor: pointer; }
-button[disabled] { opacity: .5; cursor: not-allowed; }
-input { padding: 8px; border-radius: 8px; border: 1px solid #ccc; }
-.verdict { margin-top: 8px; padding: 8px; border-radius: 8px; }
-.verdict.ok { background: #e9f9ee; color: #175f2a; }
-.verdict.bad { background: #fdecec; color: #7f1d1d; }
-.err { margin-top: 6px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; white-space: pre-wrap; }
+:root {
+    font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+}
 
+body {
+    margin: 0;
+    background: #f8f9fa;
+    color: #222;
+}
+
+.wrap {
+    padding: 32px;
+    max-width: 800px;
+    margin: auto;
+}
+
+.row {
+    display: flex;
+    gap: 8px;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    padding: 16px;
+}
+
+.left {
+    padding: 8px;
+}
+
+.right {
+    padding: 8px;
+}
+
+.statement {
+    white-space: pre-wrap;
+    padding: 12px;
+    border-radius: 8px;
+}
+
+button {
+    padding: 8px 12px;
+    border: 0;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+button[disabled] {
+    opacity: .5;
+    cursor: not-allowed;
+}
+
+.verdict {
+    margin-top: 8px;
+    padding: 8px;
+    border-radius: 8px;
+}
+
+.verdict.ok {
+    background: #e9f9ee;
+    color: #175f2a;
+}
+
+.verdict.bad {
+    background: #fdecec;
+    color: #7f1d1d;
+}
+
+.err {
+    margin-top: 6px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    white-space: pre-wrap;
+}

@@ -1,23 +1,45 @@
 import { useEffect, useState } from 'react';
 import { useSocket } from './lib/useSocket';
 import Editor from '@monaco-editor/react';
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 export default function App() {
   const { socket, connected } = useSocket();
-  const [view, setView] = useState('lobby');
+  const [view, setView] = useState('sign-up');
   const [state, setState] = useState({});
   const [code, setCode] = useState('');
-  const [name, setName] = useState('Player');
   const [selfUserId, setSelfUserId] = useState(null);
   const [scoreboard, setScoreboard] = useState([]);
   const [rematchStatus, setRematchStatus] = useState(null);
 
   const [theme, setTheme] = useState('light');
   const [section, setSection] = useState('code');
+  const [showPass, setShowPass] = useState(false);
 
   const toggleTheme = () => {
     setTheme(prev => (prev === 'light' ? 'dark' : 'light'));
   };
+
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPass, setConfirmPass] = useState("");
+  const [error, setError] = useState("");
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    if (!username) return setError("Username is required");
+    if (!password) return setError("Password is required")
+
+    if (view === "sign-up") {
+      if (!confirmPass) return setError("Please confirm your password");
+      if (password !== confirmPass) return setError("Passwords do not match");
+    }
+
+    setError("");
+
+    setView('lobby')
+  }
 
 
   const handleEditorWillMount = (monaco) => {
@@ -123,12 +145,86 @@ export default function App() {
     socket?.emit('rematch.request');
   }
 
+  if (view === 'log-in') {
+    return (
+      <div className={`w-screen h-screen overflow-hidden ${theme === 'light' ? 'bg-[#EDECF2]' : 'bg-[#2E2E31]'}`}>
+        {/* Title */}
+        <div className={`w-screen fixed h-1/16 rounded-b-lg  ${theme === 'light' ? 'bg-[#D9D9D9] text-[#8897AA] shadow-[0_4px_0_0_#777777]' : 'bg-[#404040] text-[#D1E8EE] shadow-[0_4px_0_0_#000000]'} items-center flex justify-between`}>
+          <p className="text-font text-shadow text-5xl ml-5">Leet Battle</p>
+          <p className="text-font text-5xl mr-5 select-none" onClick={toggleTheme}>{theme === 'light' ? "☽" : "☼"}</p>
+        </div>
+
+        <div className="h-full flex justify-center items-center">
+          <div className={`${theme === 'light' ? 'bg-[#D9D9D9] text-[#8897AA]' : 'bg-[#404040] text-[#D1E8EE]'} h-2/3 w-1/3 rounded-lg text-center text-font flex flex-col`}>
+            <p className="text-5xl mt-4"><u>Login</u></p>
+
+            <form id="log-in-form" onSubmit={handleSubmit}>
+              <div className="flex flex-col justify-center items-center mt-23">
+                <div className="flex flex-col items-start w-5/6 text-4xl">
+                  <p className="my-2">Username:</p>
+                  <input value={username} onChange={(e) => setUsername(e.target.value)} className={`p-2 w-full ${theme === 'light' ? 'bg-[#C2C2C2]' : 'bg-[#2A2A2A]'} rounded-lg mb-3`} />
+                  <p className="my-2">Password:</p>
+                  <div className="relative w-full">
+                    <input value={password} onChange={(e) => setPassword(e.target.value)} type={showPass ? "text" : "password"} className={`p-2 w-full ${theme === 'light' ? 'bg-[#C2C2C2]' : 'bg-[#2A2A2A]'} rounded-lg`} />
+                    <div onClick={() => setShowPass(!showPass)} className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer text-xl">
+                      {showPass ? <FaEyeSlash /> : <FaEye />}
+                    </div>
+                  </div>
+                </div>
+                <button type="submit" className={`w-1/4 text-2xl ${theme === 'light' ? 'bg-[#C2C2C2] text-[#8897AA]' : 'bg-[#2A2A2A] text-[#D1E8EE]'} rounded-lg mt-15`}>Login</button>
+              </div>
+            </form>
+
+            {error && <p className="mt-5 text-2xl text-[#FF6767]">{error}</p>}
+
+            <p className="mt-auto mb-4 text-2xl">Don't have an account? Sign Up <u onClick={() => setView("sign-up")} className="cursor-pointer">Here</u></p>
+          </div>
+        </div>
+      </div>
+    )
+  }
+  else if (view === 'sign-up') {
+    return (
+      <div className={`w-screen h-screen overflow-hidden ${theme === 'light' ? 'bg-[#EDECF2]' : 'bg-[#2E2E31]'}`}>
+        {/* Title */}
+        <div className={`w-screen fixed h-1/16 rounded-b-lg  ${theme === 'light' ? 'bg-[#D9D9D9] text-[#8897AA] shadow-[0_4px_0_0_#777777]' : 'bg-[#404040] text-[#D1E8EE] shadow-[0_4px_0_0_#000000]'} items-center flex justify-between`}>
+          <p className="text-font text-shadow text-5xl ml-5">Leet Battle</p>
+          <p className="text-font text-5xl mr-5 select-none" onClick={toggleTheme}>{theme === 'light' ? "☽" : "☼"}</p>
+        </div>
+
+        <div className="h-full flex justify-center items-center">
+          <div className={`${theme === 'light' ? 'bg-[#D9D9D9] text-[#8897AA]' : 'bg-[#404040] text-[#D1E8EE]'} h-2/3 w-1/3 rounded-lg text-center text-font flex flex-col`}>
+            <p className="text-5xl mt-4"><u>Sign Up</u></p>
+            <form id="sign-up-form" onSubmit={handleSubmit}>
+              <div className="flex flex-col justify-center items-center mt-8">
+                <div className="flex flex-col items-start w-5/6 text-4xl">
+                  <p className="my-2">Create a username:</p>
+                  <input value={username} onChange={(e) => setUsername(e.target.value)} className={`p-2 w-full ${theme === 'light' ? 'bg-[#C2C2C2]' : 'bg-[#2A2A2A]'} rounded-lg mb-3`} />
+                  <p className="my-2">Create a password:</p>
+                  <input value={password} onChange={(e) => setPassword(e.target.value)} className={`p-2 w-full ${theme === 'light' ? 'bg-[#C2C2C2]' : 'bg-[#2A2A2A]'} rounded-lg mb-3`} />
+                  <p className="my-2">Confirm password:</p>
+                  <input value={confirmPass} onChange={(e) => setConfirmPass(e.target.value)} className={`p-2 w-full ${theme === 'light' ? 'bg-[#C2C2C2]' : 'bg-[#2A2A2A]'} rounded-lg`} />
+                </div>
+
+                <button className={`w-3/5 text-2xl ${theme === 'light' ? 'bg-[#C2C2C2] text-[#8897AA]' : 'bg-[#2A2A2A] text-[#D1E8EE]'} rounded-lg mt-6`}>Create an account</button>
+              </div>
+            </form>
+
+            {error && <p className="mt-5 text-2xl text-[#FF6767]">{error}</p>}
+
+            <p className="mt-auto mb-4 text-2xl">Have an account? Login <u onClick={() => setView("log-in")} className="cursor-pointer">Here</u></p>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   if (view === 'lobby') {
     return (
       <div className="wrap">
         <h1>Leet Battle</h1>
         <div className="row">
-          <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Your name" />
+          <input value={username} onChange={(e) => setName(e.target.value)} placeholder="Your name" className="border-solid border-2" />
           <button className="bg-[#444444]" disabled={!connected} onClick={findMatch}>
             {connected ? 'Find Match' : 'Connecting...'}
           </button>
@@ -155,116 +251,118 @@ export default function App() {
 
   const youWin = state.over?.winnerId && selfUserId && state.over.winnerId === selfUserId;
 
-  return (
-    <div className={`w-screen h-screen ${theme === 'light' ? 'bg-[#EDECF2]' : 'bg-[#2E2E31]'}`}>
+  if (view === 'room') {
+    return (
+      <div className={`w-screen h-screen ${theme === 'light' ? 'bg-[#EDECF2]' : 'bg-[#2E2E31]'}`}>
 
-      {/* Title */}
-      <div className={`w-screen h-1/16 rounded-b-lg  ${theme === 'light' ? 'bg-[#D9D9D9] text-[#8897AA] shadow-[0_4px_0_0_#777777]' : 'bg-[#404040] text-[#D1E8EE] shadow-[0_4px_0_0_#000000]'} items-center flex justify-between`}>
-        <p className="text-font text-shadow text-5xl ml-5">Leet Battle</p>
-        <p className="text-font text-5xl mr-5 select-none" onClick={toggleTheme}>{theme === 'light' ? "☽" : "☼"}</p>
-      </div>
-
-      {/* Bottom Half */}
-      <div className="w-screen h-5/6 mt-10 flex flex-row gap-10">
-
-        {/* Problem Section */}
-        <div className={`h-full w-1/3 ml-10 rounded-lg ${theme === 'light' ? 'bg-[#D9D9D9] text-[#8897AA]' : 'bg-[#404040] text-[#D1E8EE]'} text-font pt-3 p-5 overflow-auto`}>
-          <h1 className="text-5xl">{state.problem?.title}</h1>
-          <p className="text-2xl">Difficulty: {state.problem?.difficulty}</p>
-
-          <pre className={`statement ${theme === 'light' ? 'bg-[#f7f7f9]' : 'bg-[#5d5d5e]'} text-2xl mt-2 text-font`}>{state.problem?.statement}</pre>
-          {/* <p className="text-2xl mt-2">"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."</p>
-              <p className="text-2xl mt-2">"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."</p>
-              <p className="text-2xl mt-2">"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."</p>
-              <p className="text-2xl mt-2">"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."</p> */}
+        {/* Title */}
+        <div className={`w-screen h-1/16 rounded-b-lg  ${theme === 'light' ? 'bg-[#D9D9D9] text-[#8897AA] shadow-[0_4px_0_0_#777777]' : 'bg-[#404040] text-[#D1E8EE] shadow-[0_4px_0_0_#000000]'} items-center flex justify-between`}>
+          <p className="text-font text-shadow text-5xl ml-5">Leet Battle</p>
+          <p className="text-font text-5xl mr-5 select-none" onClick={toggleTheme}>{theme === 'light' ? "☽" : "☼"}</p>
         </div>
 
-        {/* Right Side */}
-        <div className="flex flex-col w-3/5 gap-10">
-          {/* Score/Time */}
-          <div className={`w-full h-1/12 rounded-lg ${theme === 'light' ? 'bg-[#D9D9D9] text-[#8897AA] shadow-[0_4px_0_0_#777777]' : 'bg-[#404040] text-[#D1E8EE] shadow-[0_4px_0_0_#000000]'} text-font text-5xl items-center flex flex-row justify-between`}>
-            <p className="ml-5">{state.players?.[0]?.name ?? 'User1'}: {state.players?.[0]?.score ?? '0'}</p>
-            <p>Time Left: {state.remaining ?? state.countdownSeconds}s</p>
-            <p className="mr-5">{state.players?.[1]?.name ?? 'User2'}: {state.players?.[1]?.score ?? '0'}</p>
+        {/* Bottom Half */}
+        <div className="w-screen h-5/6 mt-10 flex flex-row gap-10">
+
+          {/* Problem Section */}
+          <div className={`h-full w-1/3 ml-10 rounded-lg ${theme === 'light' ? 'bg-[#D9D9D9] text-[#8897AA]' : 'bg-[#404040] text-[#D1E8EE]'} text-font pt-3 p-5 overflow-auto`}>
+            <h1 className="text-5xl">{state.problem?.title}</h1>
+            <p className="text-2xl">Difficulty: {state.problem?.difficulty}</p>
+
+            <pre className={`statement ${theme === 'light' ? 'bg-[#f7f7f9]' : 'bg-[#5d5d5e]'} text-2xl mt-2 text-font`}>{state.problem?.statement}</pre>
+            {/* <p className="text-2xl mt-2">"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."</p>
+                <p className="text-2xl mt-2">"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."</p>
+                <p className="text-2xl mt-2">"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."</p>
+                <p className="text-2xl mt-2">"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."</p> */}
           </div>
 
-
-          {/* Code Section */}
-          <div className={`w-full h-full ${theme === 'light' ? 'bg-[#C2C2C2]' : 'bg-[#2A2A2A]'}`}>
-            <div className={`w-full h-1/14 rounded-b-lg ${theme === 'light' ? 'bg-[#D9D9D9] text-[#8897AA] shadow-[0_4px_0_0_#777777]' : 'bg-[#404040] text-[#D1E8EE] shadow-[0_4px_0_0_#000000]'} items-center flex text-font`}>
-              <p className="text-4xl ml-3"> {'</>'} Code</p>
-            </div>
-
-            <div className="flex flex-row gap-2">
-              <div className={`${theme === 'light' ? 'text-[#8897AA]' : 'text-[#D1E8EE]'} ${section === 'code' ? 'bg-[#444444]' : 'bg-[#666666]'} select-none flex items-center w-24 justify-center rounded-t-lg`} style={{ marginTop: 8 + "px", marginLeft: 77 + "px" }} onClick={() => setSection('code')}>
-                <p className="text-font text-2xl">Python</p>
-              </div>
-
-              <div className={`${theme === 'light' ? 'text-[#D75E5E]' : 'text-[#D75E5E]'} ${section === 'code' ? 'bg-[#666666]' : 'bg-[#444444]'} select-none flex items-center w-24 justify-center rounded-t-lg`} style={{ marginTop: 8 + "px", marginLeft: 5 + "px" }} onClick={() => setSection('result')}>
-                <p className="text-font text-2xl">Result</p>
-              </div>
+          {/* Right Side */}
+          <div className="flex flex-col w-3/5 gap-10">
+            {/* Score/Time */}
+            <div className={`w-full h-1/12 rounded-lg ${theme === 'light' ? 'bg-[#D9D9D9] text-[#8897AA] shadow-[0_4px_0_0_#777777]' : 'bg-[#404040] text-[#D1E8EE] shadow-[0_4px_0_0_#000000]'} text-font text-5xl items-center flex flex-row justify-between`}>
+              <p className="ml-5">{state.players?.[0]?.name ?? 'User1'}: {state.players?.[0]?.score ?? '0'}</p>
+              <p>Time Left: {state.remaining ?? state.countdownSeconds}s</p>
+              <p className="mr-5">{state.players?.[1]?.name ?? 'User2'}: {state.players?.[1]?.score ?? '0'}</p>
             </div>
 
 
-            {/* Editor/Submit Button */}
-            {section === 'code' &&
-              <div className={`h-4/5 w-full ${theme === 'light' ? 'bg-[#D9D9D9]' : 'bg-[#404040]'} relative`}>
-                <div className="h-full">
-                  < Editor
-                    height="100%"
-                    defaultLanguage="python"
-                    value={code}
-                    onChange={(v) => setCode(v || '')}
-                    theme={theme === 'light' ? 'lightTheme' : 'darkTheme'}
-                    options={{
-                      minimap: { enabled: false },
-                      fontFamily: '"Jersey 10", sans-serif',
-                      fontSize: 24,
-                      scrollBeyondLastLine: false, // fixes a weird new line bug when it starts scrolling 15 lines down instead of the whole thing
-                      quickSuggestions: false, // get rid of suggestions
-                      overviewRulerLanes: 0, // removes a weird black line on the scroll bar
-                    }}
-                    beforeMount={handleEditorWillMount}
-                    className="flex-1 editor-left-pad"
-                  />
+            {/* Code Section */}
+            <div className={`w-full h-full ${theme === 'light' ? 'bg-[#C2C2C2]' : 'bg-[#2A2A2A]'}`}>
+              <div className={`w-full h-1/14 rounded-b-lg ${theme === 'light' ? 'bg-[#D9D9D9] text-[#8897AA] shadow-[0_4px_0_0_#777777]' : 'bg-[#404040] text-[#D1E8EE] shadow-[0_4px_0_0_#000000]'} items-center flex text-font`}>
+                <p className="text-4xl ml-3"> {'</>'} Code</p>
+              </div>
+
+              <div className="flex flex-row gap-2">
+                <div className={`${theme === 'light' ? 'text-[#8897AA]' : 'text-[#D1E8EE]'} ${section === 'code' ? 'bg-[#444444]' : 'bg-[#666666]'} select-none flex items-center w-24 justify-center rounded-t-lg`} style={{ marginTop: 8 + "px", marginLeft: 77 + "px" }} onClick={() => setSection('code')}>
+                  <p className="text-font text-2xl">Python</p>
                 </div>
 
-                <button className={`submit my-2 w-full ${theme === 'light' ? 'bg-[#444444]' : 'bg-[#666666]'}`} onClick={() => (submit(), setSection('result'))} disabled={!!state.over}>Submit</button>
+                <div className={`${theme === 'light' ? 'text-[#D75E5E]' : 'text-[#D75E5E]'} ${section === 'code' ? 'bg-[#666666]' : 'bg-[#444444]'} select-none flex items-center w-24 justify-center rounded-t-lg`} style={{ marginTop: 8 + "px", marginLeft: 5 + "px" }} onClick={() => setSection('result')}>
+                  <p className="text-font text-2xl">Result</p>
+                </div>
               </div>
-            }
 
-            {section === 'result' && state.lastResult &&
-              <div className={`w-6/7 h-4/5 verdict ${state.lastResult.verdict === 'Accepted' ? 'ok' : 'bad'} text-font text-2xl`} style={{ marginLeft: 77 + "px" }}>
-                Last verdict: {state.lastResult.verdict} ({state.lastResult.passCount}/{state.lastResult.total}) · {state.lastResult.timeMs} ms
-                {state.lastResult.error && <div className="err">{String(state.lastResult.error)}</div>}
-              </div>
-            }
 
-            {section === 'result' && !state.lastResult &&
-              <div className={`w-6/7 h-4/5 verdict bad text-font text-2xl`} style={{ marginLeft: 77 + "px" }}>
-                No Submissions Yet
-              </div>
-            }
+              {/* Editor/Submit Button */}
+              {section === 'code' &&
+                <div className={`h-4/5 w-full ${theme === 'light' ? 'bg-[#D9D9D9]' : 'bg-[#404040]'} relative`}>
+                  <div className="h-full">
+                    < Editor
+                      height="100%"
+                      defaultLanguage="python"
+                      value={code}
+                      onChange={(v) => setCode(v || '')}
+                      theme={theme === 'light' ? 'lightTheme' : 'darkTheme'}
+                      options={{
+                        minimap: { enabled: false },
+                        fontFamily: '"Jersey 10", sans-serif',
+                        fontSize: 24,
+                        scrollBeyondLastLine: false, // fixes a weird new line bug when it starts scrolling 15 lines down instead of the whole thing
+                        quickSuggestions: false, // get rid of suggestions
+                        overviewRulerLanes: 0, // removes a weird black line on the scroll bar
+                      }}
+                      beforeMount={handleEditorWillMount}
+                      className="flex-1 editor-left-pad"
+                    />
+                  </div>
+
+                  <button className={`submit my-2 w-full ${theme === 'light' ? 'bg-[#444444]' : 'bg-[#666666]'}`} onClick={() => (submit(), setSection('result'))} disabled={!!state.over}>Submit</button>
+                </div>
+              }
+
+              {section === 'result' && state.lastResult &&
+                <div className={`w-6/7 h-4/5 verdict ${state.lastResult.verdict === 'Accepted' ? 'ok' : 'bad'} text-font text-2xl`} style={{ marginLeft: 77 + "px" }}>
+                  Last verdict: {state.lastResult.verdict} ({state.lastResult.passCount}/{state.lastResult.total}) · {state.lastResult.timeMs} ms
+                  {state.lastResult.error && <div className="err">{String(state.lastResult.error)}</div>}
+                </div>
+              }
+
+              {section === 'result' && !state.lastResult &&
+                <div className={`w-6/7 h-4/5 verdict bad text-font text-2xl`} style={{ marginLeft: 77 + "px" }}>
+                  No Submissions Yet
+                </div>
+              }
+
+            </div>
 
           </div>
-
         </div>
+
+        {state.over && (
+          <div className="w-screen h-screen fixed inset-0 flex justify-center items-center bg-black/50 z-50">
+            <div className={`w-1/3 h-1/4 text-font text-center flex flex-col justify-center rounded-lg ${theme === 'light' ? 'bg-[#D9D9D9] text-[#8897AA] shadow-[0_4px_0_0_#777777]' : 'bg-[#404040] text-[#D1E8EE] shadow-[0_4px_0_0_#000000]'}`}>
+              <p className="text-5xl mt-5">🏁 {state.over.winnerId ? (youWin ? 'You win!' : 'You lose.') : 'Time up!'} 🏁</p>
+              {rematchStatus && (
+                <p className="text-4xl">Rematch ready: {rematchStatus.readyCount}/{rematchStatus.total}</p>
+              )}
+              <button className="text-2xl mx-10 mt-5 bg-[#444444] hover:bg-[#333333]" onClick={requestRematch}>🔁 Rematch?</button>
+            </div>
+          </div>
+        )}
+
       </div>
-
-      {state.over && (
-        <div className="w-screen h-screen fixed inset-0 flex justify-center items-center bg-black/50 z-50">
-          <div className={`w-1/3 h-1/4 text-font text-center flex flex-col justify-center rounded-lg ${theme === 'light' ? 'bg-[#D9D9D9] text-[#8897AA] shadow-[0_4px_0_0_#777777]' : 'bg-[#404040] text-[#D1E8EE] shadow-[0_4px_0_0_#000000]'}`}>
-            <p className="text-5xl mt-5">🏁 {state.over.winnerId ? (youWin ? 'You win!' : 'You lose.') : 'Time up!'} 🏁</p>
-            {rematchStatus && (
-              <p className="text-4xl">Rematch ready: {rematchStatus.readyCount}/{rematchStatus.total}</p>
-            )}
-            <button className="text-2xl mx-10 mt-5 bg-[#444444] hover:bg-[#333333]" onClick={requestRematch}>🔁 Rematch?</button>
-          </div>
-        </div>
-      )}
-
-    </div>
-  )
+    )
+  }
 
   //   return (
   //     <div className="grid">
