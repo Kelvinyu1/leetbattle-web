@@ -34,11 +34,15 @@ export default function App() {
     if (view === "sign-up") {
       if (!confirmPass) return setError("Please confirm your password");
       if (password !== confirmPass) return setError("Passwords do not match");
+      
+      // Send signup request to server
+      socket?.emit('auth.signup', { username, password });
+    } else if (view === "log-in") {
+      // Send login request to server
+      socket?.emit('auth.login', { username, password });
     }
 
     setError("");
-
-    setView('lobby')
   }
 
 
@@ -93,6 +97,19 @@ export default function App() {
     socket.on('session', ({ userId }) => setSelfUserId(userId));
     socket.on('scoreboard.update', (list) => setScoreboard(list));
 
+    // Auth handlers
+    socket.on('auth.success', ({ user }) => {
+      console.log('Login successful:', user);
+      setSelfUserId(user._id);
+      setUsername(user.username);
+      setView('lobby');
+      setError('');
+    });
+
+    socket.on('auth.error', ({ error }) => {
+      setError(error);
+    });
+
     socket.on('queue.status', (p) => setState((s) => ({ ...s, queue: p.status })));
 
     // First round for a newly formed room (server now emits match.start)
@@ -123,6 +140,8 @@ export default function App() {
     return () => {
       socket.off('session');
       socket.off('scoreboard.update');
+      socket.off('auth.success');
+      socket.off('auth.error');
       socket.off('queue.status');
       socket.off('match.start');
       socket.off('match.found');
@@ -139,6 +158,10 @@ export default function App() {
 
   function submit() {
     socket?.emit('room.submit', { matchId: state.matchId, code, lang: 'python' });
+  }
+
+  function autoWin() {
+    socket?.emit('test.autowin');
   }
 
   function requestRematch() {
@@ -327,6 +350,7 @@ export default function App() {
                   </div>
 
                   <button className={`submit my-2 w-full ${theme === 'light' ? 'bg-[#444444]' : 'bg-[#666666]'}`} onClick={() => (submit(), setSection('result'))} disabled={!!state.over}>Submit</button>
+                  {/* <button className={`submit my-2 w-full bg-[#FF6767] hover:bg-[#FF4444]`} onClick={autoWin} disabled={!!state.over}>🎯 Auto Win (Test)</button> */}
                 </div>
               }
 
