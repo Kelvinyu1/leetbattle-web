@@ -5,7 +5,7 @@ import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 export default function App() {
   const { socket, connected } = useSocket();
-  const [view, setView] = useState('sign-up');
+  const [view, setView] = useState('log-in');
   const [state, setState] = useState({});
   const [code, setCode] = useState('');
   const [selfUserId, setSelfUserId] = useState(null);
@@ -34,7 +34,7 @@ export default function App() {
     if (view === "sign-up") {
       if (!confirmPass) return setError("Please confirm your password");
       if (password !== confirmPass) return setError("Passwords do not match");
-      
+
       // Send signup request to server
       socket?.emit('auth.signup', { username, password });
     } else if (view === "log-in") {
@@ -116,7 +116,7 @@ export default function App() {
     socket.on('match.start', (p) => {
       // reset per-round state
       setState(p);
-      setCode(p.problem.starter_code.javascript || 'module.exports = () => {};');
+      setCode(p.problem.starter_code.javascript || '');
       setRematchStatus(null);
       setView('room');
     });
@@ -124,14 +124,14 @@ export default function App() {
     // Back-compat if server still sends match.found (shouldn’t after this patch)
     socket.on('match.found', (p) => {
       setState(p);
-      setCode(p.problem.starter_code.python || 'module.exports = () => {};');
+      setCode(p.problem.starter_code.python || '');
       setRematchStatus(null);
       setView('room');
     });
 
     socket.on('timer.tick', (t) => setState((s) => ({ ...s, remaining: t.remaining })));
     socket.on('submission.result', (r) => setState((s) => ({ ...s, lastResult: r })));
-    socket.on('match.over', (m) => setState((s) => ({ ...s, over: m })));
+    socket.on('match.over', (m) => setState((s) => ({ ...s, over: m, players: m.players ?? s.players })));
 
     socket.on('rematch.status', ({ readyCount, total }) => {
       setRematchStatus({ readyCount, total });
@@ -153,7 +153,7 @@ export default function App() {
   }, [socket]);
 
   function findMatch() {
-    socket?.emit('queue.join', { name: name || 'Player' });
+    socket?.emit('queue.join', { name: username || 'Player' });
   }
 
   function submit() {
@@ -350,7 +350,7 @@ export default function App() {
                   </div>
 
                   <button className={`submit my-2 w-full ${theme === 'light' ? 'bg-[#444444]' : 'bg-[#666666]'}`} onClick={() => (submit(), setSection('result'))} disabled={!!state.over}>Submit</button>
-                  {/* <button className={`submit my-2 w-full bg-[#FF6767] hover:bg-[#FF4444]`} onClick={autoWin} disabled={!!state.over}>🎯 Auto Win (Test)</button> */}
+                  {<button className={`submit my-2 w-full bg-[#FF6767] hover:bg-[#FF4444]`} onClick={autoWin} disabled={!!state.over}>🎯 Auto Win (Test)</button>}
                 </div>
               }
 
