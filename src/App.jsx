@@ -153,7 +153,7 @@ export default function App() {
   }, [socket]);
 
   function findMatch() {
-    socket?.emit('queue.join', { name: name || 'Player' });
+    socket?.emit('queue.join', { name: username || 'Player' });
   }
 
   function submit() {
