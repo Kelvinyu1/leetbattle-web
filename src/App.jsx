@@ -350,7 +350,7 @@ export default function App() {
                   </div>
 
                   <button className={`submit my-2 w-full ${theme === 'light' ? 'bg-[#444444]' : 'bg-[#666666]'}`} onClick={() => (submit(), setSection('result'))} disabled={!!state.over}>Submit</button>
-                  {<button className={`submit my-2 w-full bg-[#FF6767] hover:bg-[#FF4444]`} onClick={autoWin} disabled={!!state.over}>🎯 Auto Win (Test)</button>}
+                  { /* <button className={`submit my-2 w-full bg-[#FF6767] hover:bg-[#FF4444]`} onClick={autoWin} disabled={!!state.over}>🎯 Auto Win (Test)</button> */}
                 </div>
               }
 
