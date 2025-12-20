@@ -16,6 +16,8 @@ export default function App() {
   const [section, setSection] = useState('code');
   const [showPass, setShowPass] = useState(false);
 
+  const [queueTime, setQueueTime] = useState(0);
+
   const toggleTheme = () => {
     setTheme(prev => (prev === 'light' ? 'dark' : 'light'));
   };
@@ -24,6 +26,27 @@ export default function App() {
   const [password, setPassword] = useState("");
   const [confirmPass, setConfirmPass] = useState("");
   const [error, setError] = useState("");
+
+  const currentUser = scoreboard.find(p => p.name === username);
+  const userIndex = scoreboard.findIndex(p => p.name === username);
+
+  useEffect(() => {
+    if (state.queue === 'waiting') {
+      const interval = setInterval(() => {
+        setQueueTime(prev => prev + 1);
+      }, 1000);
+
+      return () => clearInterval(interval);
+    } else {
+      setQueueTime(0);
+    }
+  }, [state.queue]);
+
+  const formatTime = (seconds) => {
+    const mins = Math.floor(seconds / 60).toString().padStart(2, '0');
+    const secs = (seconds % 60).toString().padStart(2, '0');
+    return `${mins}:${secs}`;
+  }
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -119,6 +142,7 @@ export default function App() {
       setCode(p.problem.starter_code.javascript || '');
       setRematchStatus(null);
       setView('room');
+      setSection('code');
     });
 
     // Back-compat if server still sends match.found (shouldn’t after this patch)
@@ -178,7 +202,7 @@ export default function App() {
         </div>
 
         <div className="h-full flex justify-center items-center">
-          <div className={`${theme === 'light' ? 'bg-[#D9D9D9] text-[#8897AA]' : 'bg-[#404040] text-[#D1E8EE]'} h-2/3 w-1/3 rounded-lg text-center text-font flex flex-col`}>
+          <div className={`${theme === 'light' ? 'bg-[#D9D9D9] text-[#8897AA]' : 'bg-[#404040] text-[#D1E8EE]'} h-2/3 xl:w-1/3 w-1/2 rounded-lg text-center text-font flex flex-col`}>
             <p className="text-5xl mt-4"><u>Login</u></p>
 
             <form id="log-in-form" onSubmit={handleSubmit}>
@@ -216,7 +240,7 @@ export default function App() {
         </div>
 
         <div className="h-full flex justify-center items-center">
-          <div className={`${theme === 'light' ? 'bg-[#D9D9D9] text-[#8897AA]' : 'bg-[#404040] text-[#D1E8EE]'} h-2/3 w-1/3 rounded-lg text-center text-font flex flex-col`}>
+          <div className={`${theme === 'light' ? 'bg-[#D9D9D9] text-[#8897AA]' : 'bg-[#404040] text-[#D1E8EE]'} h-2/3 xl:w-1/3 w-1/2 rounded-lg text-center text-font flex flex-col`}>
             <p className="text-5xl mt-4"><u>Sign Up</u></p>
             <form id="sign-up-form" onSubmit={handleSubmit}>
               <div className="flex flex-col justify-center items-center mt-8">
@@ -244,31 +268,98 @@ export default function App() {
 
   if (view === 'lobby') {
     return (
-      <div className="wrap">
-        <h1>Leet Battle</h1>
-        <div className="row">
-          <input value={username} onChange={(e) => setName(e.target.value)} placeholder="Your name" className="border-solid border-2" />
-          <button className="bg-[#444444]" disabled={!connected} onClick={findMatch}>
-            {connected ? 'Find Match' : 'Connecting...'}
-          </button>
+      <div className={`w-screen h-screen overflow-hidden ${theme === 'light' ? 'bg-[#EDECF2]' : 'bg-[#2E2E31]'}`}>
+        {/* Title */}
+        <div className={`w-screen fixed h-1/16 rounded-b-lg  ${theme === 'light' ? 'bg-[#D9D9D9] text-[#8897AA] shadow-[0_4px_0_0_#777777]' : 'bg-[#404040] text-[#D1E8EE] shadow-[0_4px_0_0_#000000]'} items-center flex justify-between`}>
+          <p className="text-font text-shadow text-5xl ml-5">Leet Battle</p>
+          <p className="text-font text-5xl mr-5 select-none" onClick={toggleTheme}>{theme === 'light' ? "☽" : "☼"}</p>
         </div>
 
-        {/* Scoreboard shown on lobby too */}
-        {scoreboard.length > 0 && (
-          <>
-            <h3 style={{ marginTop: 24 }}>🏆 Leaderboard</h3>
-            <ol>
-              {scoreboard.slice(0, 10).map((p) => (
-                <li key={p.userId}>
-                  {p.name} — {p.wins}W/{p.losses}L
-                </li>
-              ))}
-            </ol>
-          </>
-        )}
 
-        {state.queue === 'waiting' && <p>⏳ Waiting for an opponent… open a second window to test.</p>}
+
+        <div className="h-full w-screen flex flex-row mt-20 xl:ml-15 ml-10">
+
+          {/* Leeter-Board */}
+          <div className="w-3/5 h-4/6 flex flex-col">
+            <p className={`${theme === 'light' ? 'text-[#8897AA]' : 'text-[#D1E8EE]'} text-center text-font text-shadow text-5xl ml-5`}>LEETER-BOARD</p>
+
+            <div className={`${theme === 'light' ? 'bg-[#D9D9D9]' : 'bg-[#404040]'} h-full text-font mt-2`}>
+
+              <div className={`${theme === 'light' ? 'bg-[#6D6D6D] shadow-[0_4px_0_0_#434343]' : 'bg-[#404040] shadow-[0_4px_0_0_#000000]'} h-1/10 flex text-white xl:text-4xl text-3xl pr-2`}>
+                <div className="flex-1 flex items-center justify-center">Ranking</div>
+                <div className={`${theme === 'light' ? 'bg-[#535353]' : 'bg-[#535353]'} w-0.5`}></div>
+                <div className="flex-4 flex items-center justify-center">Name</div>
+                <div className={`${theme === 'light' ? 'bg-[#535353]' : 'bg-[#535353]'} w-0.5`}></div>
+                <div className="flex-1 flex items-center justify-center">Wins</div>
+              </div>
+
+              {/* Inner Rankings */}
+              <div className="overflow-y-scroll h-full">
+                {scoreboard.length > 0 && (
+                  <>
+                    {scoreboard.slice(0, 50).map((p, index) => (
+                      <div key={p.userId} className={`${theme === 'light' ? 'bg-[#C2C2C2] shadow-[0_4px_0_0_#434343]' : 'bg-[#2A2A2A] shadow-[0_4px_0_0_#0C0C0C]'} h-1/10 flex text-white xl:text-4xl text-3xl mt-0.5 rounded-lg`}>
+                        <div className={`flex-1 flex items-center justify-center ${index === 0 ? 'text-[#A3FFA9]' : index === 1 ? 'text-[#E8E8E8]' : index === 2 ? 'text-[#CE9700]' : ''}`}>{index + 1}</div>
+                        <div className={`${theme === 'light' ? 'bg-[#535353]' : 'bg-[#535353]'} w-0.5`}></div>
+                        <div className="flex-4 flex items-center justify-center">{p.name}</div>
+                        <div className={`${theme === 'light' ? 'bg-[#535353]' : 'bg-[#535353]'} w-0.5`}></div>
+                        <div className="flex-1 flex items-center justify-center">{p.wins}</div>
+                      </div>
+                    ))}
+                  </>
+                )}
+              </div>
+
+              {/* Personal Ranking */}
+              <div className={`${theme === 'light' ? 'bg-[#C2C2C2] shadow-[0_4px_0_0_#434343]' : 'bg-[#2A2A2A] shadow-[0_4px_0_0_#0C0C0C]'} h-1/10 flex text-white xl:text-4xl text-3xl mt-0.5 rounded-lg pr-2 mt-5`}>
+                <div className={`flex-1 flex items-center justify-center ${userIndex === 0 ? 'text-[#A3FFA9]' : userIndex === 1 ? 'text-[#E8E8E8]' : userIndex === 2 ? 'text-[#CE9700]' : ''}`}>{userIndex + 1}</div>
+                <div className={`${theme === 'light' ? 'bg-[#535353]' : 'bg-[#535353]'} w-0.5`}></div>
+                <div className="flex-4 flex items-center justify-center">{currentUser?.name}</div>
+                <div className={`${theme === 'light' ? 'bg-[#535353]' : 'bg-[#535353]'} w-0.5`}></div>
+                <div className="flex-1 flex items-center justify-center">{currentUser?.wins}</div>
+              </div>
+
+            </div>
+          </div>
+
+          {/* Queue */}
+          <div className={`w-2/5 h-5/7 flex flex-col justify-end items-center text-font text-shadow ${theme === 'light' ? 'text-[#8897AA]' : 'text-[#D1E8EE]'}`}>
+            <p className="xl:text-6xl text-4xl"> {state.queue === 'waiting' ? `In Queue ${formatTime(queueTime)}` : 'Waiting to Queue'}</p>
+            <button className={`${theme === 'light' ? 'bg-[#D9D9D9] shadow-[0_4px_0_0_#434343]' : 'bg-[#404040] shadow-[0_4px_0_0_#151515]'} text-shadow text-3xl h-1/10 w-1/2 mt-5`} disabled={!connected} onClick={findMatch}>
+              {connected ? 'QUEUE' : 'MATCH FOUND'}
+            </button>
+          </div>
+
+        </div>
+
       </div>
+
+      /* OLD
+      <div className="wrap">
+              <h1>Leet Battle</h1>
+              <div className="row">
+                <input value={username} onChange={(e) => setName(e.target.value)} placeholder="Your name" className="border-solid border-2" />
+                <button className="bg-[#444444]" disabled={!connected} onClick={findMatch}>
+                  {connected ? 'Find Match' : 'Connecting...'}
+                </button>
+              </div>
+      
+              {Scoreboard shown on lobby too}
+              {scoreboard.length > 0 && (
+                <>
+                  <h3 style={{ marginTop: 24 }}>🏆 Leaderboard</h3>
+                  <ol>
+                    {scoreboard.slice(0, 10).map((p) => (
+                      <li key={p.userId}>
+                        {p.name} — {p.wins}W/{p.losses}L
+                      </li>
+                    ))}
+                  </ol>
+                </>
+              )}
+      
+              {state.queue === 'waiting' && <p>⏳ Waiting for an opponent… open a second window to test.</p>}
+            </div> */
     );
   }
 
@@ -300,7 +391,7 @@ export default function App() {
           </div>
 
           {/* Right Side */}
-          <div className="flex flex-col w-3/5 gap-10">
+          <div className="flex flex-col w-3/5 gap-5 xl:gap-10">
             {/* Score/Time */}
             <div className={`w-full h-1/12 rounded-lg ${theme === 'light' ? 'bg-[#D9D9D9] text-[#8897AA] shadow-[0_4px_0_0_#777777]' : 'bg-[#404040] text-[#D1E8EE] shadow-[0_4px_0_0_#000000]'} text-font text-5xl items-center flex flex-row justify-between`}>
               <p className="ml-5">{state.players?.[0]?.name ?? 'User1'}: {state.players?.[0]?.score ?? '0'}</p>
@@ -328,7 +419,7 @@ export default function App() {
 
               {/* Editor/Submit Button */}
               {section === 'code' &&
-                <div className={`h-4/5 w-full ${theme === 'light' ? 'bg-[#D9D9D9]' : 'bg-[#404040]'} relative`}>
+                <div className={`xl:h-4/5 h-7/9 w-full ${theme === 'light' ? 'bg-[#D9D9D9]' : 'bg-[#404040]'} relative`}>
                   <div className="h-full">
                     < Editor
                       height="100%"
@@ -349,7 +440,7 @@ export default function App() {
                     />
                   </div>
 
-                  <button className={`submit my-2 w-full ${theme === 'light' ? 'bg-[#444444]' : 'bg-[#666666]'}`} onClick={() => (submit(), setSection('result'))} disabled={!!state.over}>Submit</button>
+                  <button className={`submit xl:my-2 mt-4 w-full ${theme === 'light' ? 'bg-[#444444]' : 'bg-[#666666]'}`} onClick={() => (submit(), setSection('result'))} disabled={!!state.over}>Submit</button>
                   { /* <button className={`submit my-2 w-full bg-[#FF6767] hover:bg-[#FF4444]`} onClick={autoWin} disabled={!!state.over}>🎯 Auto Win (Test)</button> */}
                 </div>
               }
@@ -377,9 +468,14 @@ export default function App() {
             <div className={`w-1/3 h-1/4 text-font text-center flex flex-col justify-center rounded-lg ${theme === 'light' ? 'bg-[#D9D9D9] text-[#8897AA] shadow-[0_4px_0_0_#777777]' : 'bg-[#404040] text-[#D1E8EE] shadow-[0_4px_0_0_#000000]'}`}>
               <p className="text-5xl mt-5">🏁 {state.over.winnerId ? (youWin ? 'You win!' : 'You lose.') : 'Time up!'} 🏁</p>
               {rematchStatus && (
-                <p className="text-4xl">Rematch ready: {rematchStatus.readyCount}/{rematchStatus.total}</p>
+                <div>
+                  <p className="text-4xl">Rematch ready: {rematchStatus.readyCount}/{rematchStatus.total}</p>
+                  <button className="text-2xl mx-10 mt-2 bg-[#444444] hover:bg-[#333333]" onClick={requestRematch}>🔁 Rematch?</button>
+                </div>
               )}
-              <button className="text-2xl mx-10 mt-5 bg-[#444444] hover:bg-[#333333]" onClick={requestRematch}>🔁 Rematch?</button>
+              {!rematchStatus && (
+                <button className="text-2xl mx-10 mt-5 bg-[#444444] hover:bg-[#333333]" onClick={requestRematch}>🔁 Rematch?</button>
+              )}
             </div>
           </div>
         )}
@@ -388,6 +484,7 @@ export default function App() {
     )
   }
 
+  // OLD
   //   return (
   //     <div className="grid">
   //       <div className="left">
